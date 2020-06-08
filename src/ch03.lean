@@ -18,7 +18,7 @@ namespace ex01
         )
     -- short version
     example : p ∧ q ↔ q ∧ p :=
-        iff.intro (λ h, ⟨h.right, h.left⟩) (λ h, ⟨h.right, h.left⟩)
+        ⟨λ h, ⟨h.right, h.left⟩, λ h, ⟨h.right, h.left⟩⟩
 
 
 
@@ -62,8 +62,8 @@ namespace ex01
     -- short vertion
     example : (p ∧ q) ∧ r ↔ p ∧ (q ∧ r) :=
         iff.intro
-        (λ hl, ⟨hl.left.left, ⟨hl.left.right, hl.right⟩⟩)
-        (λ hr, ⟨⟨hr.left, hr.right.left⟩, hr.right.right⟩)
+        (λ h, ⟨h.left.left, ⟨h.left.right, h.right⟩⟩)
+        (λ h, ⟨⟨h.left, h.right.left⟩, h.right.right⟩)
 
 
 
@@ -363,6 +363,7 @@ namespace ex01
         λ h, λ g, h.right (g h.left)
 
 
+
     example : ¬p → (p → q) :=
         assume hnp : ¬p,
         assume hp : p,
@@ -440,6 +441,9 @@ namespace ex01
         assume hnq : ¬q,
         assume hp : p,
         hnq (h hp)
+    -- short version
+    example : (p → q) → (¬q → ¬p) :=
+        λ h, λ hnq, λ hp, hnq (h hp)
 end ex01
 
 namespace ex02
@@ -476,6 +480,17 @@ namespace ex02
                 assume hp : p,
                 show r, from false.elim (hnp hp)
         )
+    -- short version
+    example : (p → r ∨ s) → ((p → r) ∨ (p → s)) :=
+        λ h,
+        (em p).elim
+        (
+            λ hp,
+            (h hp).elim
+            (λ hr, or.inl (λ hp : p, hr))
+            (λ hs, or.inr (λ hp : p, hs))
+        )
+        (λ hnp, or.inl (λ hp, absurd hp hnp))
 
 
 
@@ -493,6 +508,12 @@ namespace ex02
             assume hnp : ¬p,
             or.inl hnp
         )
+    -- short version
+    example : ¬(p ∧ q) → ¬p ∨ ¬q :=
+        λ h,
+        or.elim (em p)
+        (λ hp, or.inr (λ hq, h ⟨hp, hq⟩))
+        (λ hnp, or.inl hnp)
 
 
 
@@ -521,6 +542,20 @@ namespace ex02
                 false.elim (hnp hp),
             false.elim (h hpimplq)
         )
+    -- short version
+    example : ¬(p → q) → p ∧ ¬q :=
+        λ h,
+        (em p).elim
+        (
+            λ hp : p,
+            (em q).elim
+            (λ hq, absurd (λ hp', hq) h)
+            (λ hnq, ⟨hp, hnq⟩)
+        )
+        (
+            λ hnp,
+            false.elim (h (λ hp, absurd hp hnp))
+        )
 
 
 
@@ -535,6 +570,12 @@ namespace ex02
             assume hnp : ¬p,
             or.inl hnp
         )
+    -- short version
+    example : (p → q) → (¬p ∨ q) :=
+        λ h,
+        (em p).elim
+        (λ hp, or.inr (h hp))
+        (λ hnp, or.inl hnp)
 
 
 
@@ -550,6 +591,13 @@ namespace ex02
             assume hnq : ¬q,
             absurd hp (h hnq)
         )
+    -- short version
+    example : (¬q → ¬p) → (p → q) :=
+        λ h,
+        λ hp,
+        (em q).elim
+        id
+        (λ hnq, absurd hp (h hnq))
 
 
 
@@ -572,6 +620,12 @@ namespace ex02
                 absurd hp hnp,
             absurd (h hpimplq) hnp
         )
+    -- short version
+    example : (((p → q) → p) → p) :=
+        λ h,
+        (em p).elim
+        id
+        (λ hnp, absurd (h (λ hp : p, absurd hp hnp)) hnp)
 end ex02
 
 namespace ex03
@@ -590,4 +644,9 @@ namespace ex03
             show false, from absurd hp (hpimplnp hp),
         have hp : p, from hnpimplp hnp,
         absurd hp hnp
+    -- short version
+    example : ¬(p ↔ ¬p) :=
+        λ h,
+        have hnp : ¬p, from λ hp, absurd hp (h.mp hp),
+        absurd (h.mpr hnp) hnp
 end ex03
