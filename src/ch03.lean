@@ -524,14 +524,54 @@ namespace ex02
 
 
 
-    example : (p → q) → (¬p ∨ q) := sorry
+    example : (p → q) → (¬p ∨ q) :=
+        assume h : p → q,
+        (em p).elim
+        (
+            assume hp : p,
+            or.inr (h hp)
+        )
+        (
+            assume hnp : ¬p,
+            or.inl hnp
+        )
 
-    example : (¬q → ¬p) → (p → q) := sorry
 
-    example : p ∨ ¬p := sorry
 
-    example : (((p → q) → p) → p) := sorry
+    example : (¬q → ¬p) → (p → q) :=
+        assume h : ¬q → ¬p,
+        assume hp : p,
+        (em q).elim
+        (
+            assume hq : q,
+            hq
+        )
+        (
+            assume hnq : ¬q,
+            absurd hp (h hnq)
+        )
 
+
+
+    example : p ∨ ¬p :=
+        em p
+
+
+
+    example : (((p → q) → p) → p) :=
+        assume h : (p → q) → p,
+        (em p).elim
+        (
+            assume hp : p,
+            hp
+        )
+        (
+            assume hnp : ¬p,
+            have hpimplq : p → q, from
+                assume hp : p,
+                absurd hp hnp,
+            absurd (h hpimplq) hnp
+        )
 end ex02
 
 namespace ex03
@@ -541,6 +581,13 @@ namespace ex03
 
     variables p : Prop
 
-    example : ¬(p ↔ ¬p) := sorry
-
+    example : ¬(p ↔ ¬p) :=
+        assume hpiffnp : p ↔ ¬p,
+        have hpimplnp : p → ¬p, from iff.elim_left hpiffnp,
+        have hnpimplp : ¬p → p, from iff.elim_right hpiffnp,
+        have hnp : ¬p, from
+            assume hp : p,
+            show false, from absurd hp (hpimplnp hp),
+        have hp : p, from hnpimplp hnp,
+        absurd hp hnp
 end ex03
