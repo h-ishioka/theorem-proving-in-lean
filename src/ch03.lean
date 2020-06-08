@@ -533,3 +533,14 @@ namespace ex02
     example : (((p → q) → p) → p) := sorry
 
 end ex02
+
+namespace ex03
+    /-
+    3. Prove ¬(p ↔ ¬p) without using classical logic.
+    -/
+
+    variables p : Prop
+
+    example : ¬(p ↔ ¬p) := sorry
+
+end ex03
