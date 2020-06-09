@@ -31,6 +31,28 @@ namespace ex01
 
 
 
-    example : (∀ x, p x → q x) → (∀ x, p x) → (∀ x, q x) := sorry
-    example : (∀ x, p x) ∨ (∀ x, q x) → ∀ x, p x ∨ q x := sorry
+    example : (∀ x, p x → q x) → (∀ x, p x) → (∀ x, q x) :=
+        assume h : ∀ x, p x → q x,
+        assume g : ∀ x, p x,
+        show ∀ x, q x, from
+            assume x,
+            show q x, from (h x) (g x)
+
+
+
+    example : (∀ x, p x) ∨ (∀ x, q x) → ∀ x, p x ∨ q x :=
+        assume h : (∀ x, p x) ∨ (∀ x, q x),
+        show ∀ x, p x ∨ q x, from
+            assume x,
+            h.elim
+            (
+                assume h1 : ∀ x, p x,
+                show p x ∨ q x, from
+                    or.inl (h1 x)
+            )
+            (
+                assume h2 : ∀ x, q x,
+                show p x ∨ q x, from
+                    or.inr (h2 x)
+            )
 end ex01
