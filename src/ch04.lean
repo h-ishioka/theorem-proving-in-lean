@@ -56,3 +56,16 @@ namespace ex01
                     or.inr (h2 x)
             )
 end ex01
+
+namespace ex02
+    /-
+    2. It is often possible to bring a component of a formula outside a universal quantifier, when it does not depend on the quantified variable. Try proving these (one direction of the second of these requires classical logic):
+    -/
+
+    variables (α : Type) (p q : α → Prop)
+    variable r : Prop
+
+    example : α → ((∀ x : α, r) ↔ r) := sorry
+    example : (∀ x, p x ∨ r) ↔ (∀ x, p x) ∨ r := sorry
+    example : (∀ x, r → p x) ↔ (r → ∀ x, p x) := sorry
+end ex02
