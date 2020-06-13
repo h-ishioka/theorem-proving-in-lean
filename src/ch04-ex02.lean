@@ -21,6 +21,11 @@ example : α → ((∀ x : α, r) ↔ r) :=
                 assume hx : α,
                 show r, from h
         )
+-- short version
+example : α → ((∀ x : α, r) ↔ r) :=
+    λ a, iff.intro (λ h, h a) (λ h, λ hx, h)
+
+
 
 example : (∀ x, p x ∨ r) ↔ (∀ x, p x) ∨ r :=
     iff.intro
@@ -65,6 +70,26 @@ example : (∀ x, p x ∨ r) ↔ (∀ x, p x) ∨ r :=
                 or.inr h2
         )
     )
+-- shor version
+example : (∀ x, p x ∨ r) ↔ (∀ x, p x) ∨ r :=
+    iff.intro
+    (
+        λ h,
+        (em r).elim
+        (
+            λ hr : r,
+            or.inr hr
+        )
+        (
+            λ hnr : ¬r,
+            or.inl (λ xx, (h xx).elim id (λ hr, absurd hr hnr) )
+        )
+    )
+    (
+        λ h, or.elim h (λ h1, λ x, or.inl (h1 x)) (λ h2, λ x, or.inr h2)
+    )
+
+
 
 example : (∀ x, r → p x) ↔ (r → ∀ x, p x) :=
     iff.intro
@@ -83,3 +108,6 @@ example : (∀ x, r → p x) ↔ (r → ∀ x, p x) :=
             assume hr : r,
             (h hr) xx
     )
+-- short version
+example : (∀ x, r → p x) ↔ (r → ∀ x, p x) :=
+    ⟨(λ h, λ hr, λ xx, (h xx) hr), (λ h, λ xx, λ hr, (h hr) xx)⟩
