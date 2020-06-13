@@ -128,7 +128,38 @@ example : (∃ x, p x ∨ q x) ↔ (∃ x, p x) ∨ (∃ x, q x) :=
 
 
 
-example : (∀ x, p x) ↔ ¬ (∃ x, ¬ p x) := sorry
+example : (∀ x, p x) ↔ ¬ (∃ x, ¬ p x) :=
+    iff.intro
+    (
+        assume h : ∀ x, p x,
+        show ¬ (∃ x, ¬ p x), from
+            assume ⟨xx, hnpxx⟩,
+            hnpxx (h xx)
+    )
+    (
+        assume h : ¬ (∃ x, ¬ p x),
+        assume xx : α,
+        by_contradiction
+        (
+            assume h1 : ¬ p xx,
+            h (exists.intro xx h1)
+        )
+    )
+-- short version
+example : (∀ x, p x) ↔ ¬ (∃ x, ¬ p x) :=
+    iff.intro
+    (
+        λ h, λ ⟨xx, hnpxx⟩, hnpxx (h xx)
+    )
+    (
+        λ h,
+        λ xx,
+        by_contradiction
+        (λ h1, h (exists.intro xx h1))
+    )
+
+
+
 example : (∃ x, p x) ↔ ¬ (∀ x, ¬ p x) := sorry
 example : (¬ ∃ x, p x) ↔ (∀ x, ¬ p x) := sorry
 example : (¬ ∀ x, p x) ↔ (∃ x, ¬ p x) := sorry
