@@ -17,7 +17,7 @@ example : (∃ x : α, r) → r :=
     )
 --short version
 example : (∃ x : α, r) → r :=
-    λ h, exists.elim h (λ xx : α, id)
+    λ ⟨xx, hr⟩, hr
 
 
 
@@ -61,27 +61,72 @@ example : (∃ x, p x ∧ r) ↔ (∃ x, p x) ∧ r :=
     )
 -- short version
 example : (∃ x, p x ∧ r) ↔ (∃ x, p x) ∧ r :=
+    ⟨λ ⟨xx, hl, hr⟩, ⟨⟨xx, hl⟩, hr⟩, λ ⟨⟨xx, hpxx⟩, hr⟩, ⟨xx, hpxx, hr⟩⟩
+
+
+
+example : (∃ x, p x ∨ q x) ↔ (∃ x, p x) ∨ (∃ x, q x) :=
     iff.intro
     (
-        λ h,
+        assume h : ∃ x, p x ∨ q x,
         exists.elim h
         (
-            λ xx,
-            λ h1,
-            and.intro
-            (exists.intro xx h1.left)
-            (h1.right)
+            assume xx : α,
+            assume h1 : p xx ∨ q xx,
+            or.elim h1
+            (
+                assume h2 : p xx,
+                show (∃ x, p x) ∨ (∃ x, q x), from
+                    or.inl (exists.intro xx h2)
+            )
+            (
+                assume h2 : q xx,
+                show (∃ x, p x) ∨ (∃ x, q x), from
+                    or.inr (exists.intro xx h2)
+            )
         )
     )
     (
+        assume h : (∃ x, p x) ∨ (∃ x, q x),
+        or.elim h
+        (
+            assume h1 : ∃ x, p x,
+            exists.elim h1
+            (
+                assume xx : α,
+                assume h2 : p xx,
+                show ∃ x, p x ∨ q x, from
+                    exists.intro xx (or.inl h2)
+            )
+        )
+        (
+            assume h1 : ∃ x, q x,
+            exists.elim h1
+            (
+                assume xx : α,
+                assume h2 : q xx,
+                show ∃ x, p x ∨ q x, from
+                    exists.intro xx (or.inr h2)
+            )
+        )
+    )
+-- short version
+example : (∃ x, p x ∨ q x) ↔ (∃ x, p x) ∨ (∃ x, q x) :=
+    iff.intro
+    (
+        λ ⟨xx, h1⟩,
+        h1.elim
+        (λ hpxx, or.inl ⟨xx, hpxx⟩)
+        (λ hqxx, or.inr ⟨xx, hqxx⟩)
+    )
+    (
         λ h,
-        exists.elim h.left
-        (λ xx, λ hpxx, ⟨xx, (and.intro hpxx h.right)⟩)
+        h.elim
+        (λ ⟨xx, hpxx⟩, ⟨xx, or.inl hpxx⟩)
+        (λ ⟨xx, hqxx⟩, ⟨xx, or.inr hqxx⟩)
     )
 
 
-
-example : (∃ x, p x ∨ q x) ↔ (∃ x, p x) ∨ (∃ x, q x) := sorry
 
 example : (∀ x, p x) ↔ ¬ (∃ x, ¬ p x) := sorry
 example : (∃ x, p x) ↔ ¬ (∀ x, ¬ p x) := sorry
