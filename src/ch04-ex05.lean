@@ -160,10 +160,185 @@ example : (∀ x, p x) ↔ ¬ (∃ x, ¬ p x) :=
 
 
 
-example : (∃ x, p x) ↔ ¬ (∀ x, ¬ p x) := sorry
-example : (¬ ∃ x, p x) ↔ (∀ x, ¬ p x) := sorry
-example : (¬ ∀ x, p x) ↔ (∃ x, ¬ p x) := sorry
+example : (∃ x, p x) ↔ ¬ (∀ x, ¬ p x) :=
+    iff.intro
+    (
+        assume h : ∃ x, p x,
+        exists.elim h
+        (
+            assume x1 : α,
+            assume hpx1 : p x1,
+            show ¬ (∀ x, ¬ p x), from
+                assume h1 : ∀ x, ¬ p x,
+                absurd hpx1 (h1 x1)
+        )
+    )
+    (
+        assume h : ¬ (∀ x, ¬ p x),
+        by_contradiction
+        (
+            assume h1 : ¬ ∃ x, p x,
+            have h2 : ∀ x, ¬ p x, from
+                assume x1,
+                assume h3 : p x1,
+                have h4 : ∃ x, p x, from  ⟨x1, h3⟩,
+                    show false, from h1 h4,
+            show false, from h h2
+        )
+    )
+-- short version
+example : (∃ x, p x) ↔ ¬ (∀ x, ¬ p x) :=
+    iff.intro
+    (
+        λ ⟨x1, hpx1⟩, λ h1, absurd hpx1 (h1 x1)
+    )
+    (
+        λ h,
+        by_contradiction
+        (λ h1, h (λ x1, λ h2, h1 ⟨x1, h2⟩))
+    )
 
-example : (∀ x, p x → r) ↔ (∃ x, p x) → r := sorry
-example : (∃ x, p x → r) ↔ (∀ x, p x) → r := sorry
-example : (∃ x, r → p x) ↔ (r → ∃ x, p x) := sorry
+
+
+example : (¬ ∃ x, p x) ↔ (∀ x, ¬ p x) :=
+    iff.intro
+    (
+        assume h : ¬ ∃ x, p x,
+        assume x1 : α,
+        assume hpx1 : p x1,
+        have h1 : ∃ x, p x, from
+            exists.intro x1 hpx1,
+        show false, from h h1
+    )
+    (
+        assume h : ∀ x, ¬ p x,
+        assume h1 : ∃ x, p x,
+        exists.elim h1
+        (
+            assume x1 : α,
+            assume hpx1 : p x1,
+            show false, from (h x1) hpx1
+        )
+    )
+-- short version
+example : (¬ ∃ x, p x) ↔ (∀ x, ¬ p x) :=
+    iff.intro
+    (λ h, λ x1, λ hpx1, h (exists.intro x1 hpx1))
+    (λ h, (λ ⟨x1, hpx1⟩, (h x1) hpx1))
+
+
+
+example : (¬ ∀ x, p x) ↔ (∃ x, ¬ p x) :=
+    iff.intro
+    (
+        assume h : ¬ ∀ x, p x,
+        by_contradiction
+        (
+            assume h1 : ¬ (∃ x, ¬ p x),
+            have h2 : ∀ x, p x, from
+                assume x1 : α,
+                by_contradiction
+                (
+                    assume h3 : ¬ p x1,
+                    h1 (exists.intro x1 h3)
+                ),
+            h h2
+        )
+    )
+    (
+        assume ⟨x1, hnpx1⟩,
+        assume h1 : ∀ x, p x,
+        absurd (h1 x1) hnpx1
+    )
+
+
+
+example : (∀ x, p x → r) ↔ (∃ x, p x) → r :=
+    iff.intro
+    (
+        assume h : ∀ x, p x → r,
+        assume ⟨(x1 : α), (hpx1 : p x1)⟩,
+        (h x1) hpx1
+    )
+    (
+        assume h : (∃ x, p x) → r,
+        assume x1 : α,
+        assume hpx1 : p x1,
+        h (exists.intro x1 hpx1)
+    )
+
+
+
+example : (∃ x, p x → r) ↔ (∀ x, p x) → r :=
+    iff.intro
+    (
+        assume ⟨(x1 : α), (h1 : p x1 → r)⟩,
+        assume h2 : ∀ x, p x,
+        h1 (h2 x1)
+    )
+    (
+        assume h : (∀ x, p x) → r,
+        show ∃ x, p x → r, from
+            by_cases
+            (
+                assume h1 : ∀ x, p x, ⟨a, λ h', h h1⟩
+            )
+            (
+                assume h1 : ¬ ∀ x, p x,
+                by_contradiction
+                (
+                    assume h2 : ¬ ∃ x, p x → r,
+                    have h3 : ∀ x, p x, from
+                        assume x,
+                        by_contradiction
+                        (
+                            assume hnp : ¬ p x,
+                            have h4 : ∃ x, p x → r, from
+                                ⟨x, (assume hp, absurd hp hnp)⟩,
+                            show false, from h2 h4
+                        ),
+                    show false, from h1 h3
+                )
+            )
+    )
+
+
+
+example : (∃ x, r → p x) ↔ (r → ∃ x, p x) :=
+    iff.intro
+    (
+        assume ⟨(x1 : α), (h1 : r → p x1)⟩,
+        assume hr : r,
+        exists.intro x1 (h1 hr)
+    )
+    (
+        assume h : r → ∃ x, p x,
+        by_contradiction
+        (
+            assume h1 : ¬ ∃ x, r → p x,
+            have h2 : ∀ x, ¬ (r → p x), from
+                assume x1 : α,
+                assume h3 : r → p x1,
+                show false, from h1 ⟨x1, h3⟩,
+            have h3 : ∀ x, r ∧ ¬ p x, from
+                assume x1 : α,
+                (em r).elim
+                (
+                    assume hr : r,
+                    (em (p x1)).elim
+                    (assume hpx1, absurd (λ hp', hpx1) (h2 x1))
+                    (assume hnpx1, ⟨hr, hnpx1⟩)
+                )
+                (
+                    assume hnr,
+                    false.elim ((h2 x1) (λ hp, absurd hp hnr))
+                ),
+            have h4 : ∀ x, ¬ p x, from
+                assume x1 : α, (h3 x1).right,
+            have hr : r, from (h3 a).left,
+            match h hr with ⟨(x1 : α), (hpx1 : p x1)⟩ :=
+                have hnpx1 : ¬ p x1, from h4 x1,
+                hnpx1 hpx1
+            end
+        )
+    )
