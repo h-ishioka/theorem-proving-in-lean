@@ -2,7 +2,7 @@
 7. Prove the theorem below, using only the ring properties of ℤ enumerated in Section 4.2 and the theorem sub_self.
 -/
 
-import data.real.nnreal
+import data.int.basic
 
 #check sub_self
 
