@@ -296,19 +296,95 @@ namespace ch03_ex02
     variables p q r s : Prop
 
     example : (p → r ∨ s) → ((p → r) ∨ (p → s)) :=
-    sorry
+    begin
+        intro h,
+        cases (em p) with hp hnp,
+        have hrs : r ∨ s, from h hp,
+        cases hrs with hr hs,
+        left,
+        intro hp,
+        exact hr,
+        right,
+        intro hp,
+        exact hs,
+        left,
+        intro hp,
+        contradiction
+    end
+
     example : ¬(p ∧ q) → ¬p ∨ ¬q :=
-    sorry
+    begin
+        intro h,
+        cases (em p) with hp hnp,
+        right,
+        intro hq,
+        exact h ⟨hp, hq⟩,
+        left,
+        exact hnp
+    end
+
     example : ¬(p → q) → p ∧ ¬q :=
-    sorry
+    begin
+        intro h,
+        cases (em p) with hp hnp,
+        cases (em q) with hq hnq,
+        apply and.intro,
+        exact hp,
+        have hpimplq : p → q, from
+            begin
+                intro hp,
+                exact hq
+            end,
+        contradiction,
+        apply and.intro,
+        exact hp,
+        exact hnq,
+        have hpimplq : p → q, from
+            begin
+                intro hp,
+                contradiction
+            end,
+        contradiction
+    end
+
     example : (p → q) → (¬p ∨ q) :=
-    sorry
+    begin
+        intro h,
+        cases (em p) with hp hnp,
+        right,
+        exact h hp,
+        left,
+        exact hnp
+    end
+
     example : (¬q → ¬p) → (p → q) :=
-    sorry
+    begin
+        intro h,
+        intro hp,
+        cases (em q) with hq hnq,
+        exact hq,
+        have hnp : ¬ p, from h hnq,
+        contradiction
+    end
+
     example : p ∨ ¬p :=
-    sorry
+    begin
+        exact (em p)
+    end
+
     example : (((p → q) → p) → p) :=
-    sorry
+    begin
+        intro h1,
+        cases (em p) with hp hnp,
+        exact hp,
+        have hpimplq : p → q, from
+            begin
+                intro hp,
+                contradiction
+            end,
+        have hp : p, from h1 hpimplq,
+        contradiction
+    end
 end ch03_ex02
 
 namespace ch03_ex03
