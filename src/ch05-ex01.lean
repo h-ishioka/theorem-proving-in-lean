@@ -538,27 +538,183 @@ namespace ch04_ex05
     variable r : Prop
 
     example : (∃ x : α, r) → r :=
-    sorry
+    begin
+        intro h,
+        cases h with xx hr,
+        exact hr
+    end
+
+    include a
     example : r → (∃ x : α, r) :=
-    sorry
+    begin
+        intro hr,
+        existsi a,
+        exact hr
+    end
+
     example : (∃ x, p x ∧ r) ↔ (∃ x, p x) ∧ r :=
-    sorry
+    begin
+        apply iff.intro,
+        -- ->
+        intro h,
+        cases h with xx h1,
+        cases h1 with hpxx hr,
+        apply and.intro,
+        existsi xx,
+        exact hpxx,
+        exact hr,
+        -- <-
+        intro h,
+        cases h with h1 hr,
+        cases h1 with xx hpxx,
+        existsi xx,
+        apply and.intro,
+        repeat { assumption }
+    end
+
     example : (∃ x, p x ∨ q x) ↔ (∃ x, p x) ∨ (∃ x, q x) :=
-    sorry
+    begin
+        apply iff.intro,
+        -- ->
+        intro h,
+        cases h with xx h1,
+        cases h1 with hpxx hqxx,
+        left,
+        existsi xx,
+        exact hpxx,
+        right,
+        existsi xx,
+        exact hqxx,
+        -- <-
+        intro h,
+        cases h with hl hr,
+        cases hl with xx hpxx,
+        existsi xx,
+        left,
+        exact hpxx,
+        cases hr with xx hqxx,
+        existsi xx,
+        right,
+        exact hqxx
+    end
 
     example : (∀ x, p x) ↔ ¬ (∃ x, ¬ p x) :=
-    sorry
+    begin
+        apply iff.intro,
+        -- ->
+        intro h,
+        intro h1,
+        cases h1 with xx hnpxx,
+        have hpxx : p xx, from h xx,
+        contradiction,
+        -- <-
+        intro h,
+        intro xx,
+        exact by_contradiction
+            begin
+                intro h1,
+                have h2 : ∃ (x : α), ¬ p x, from
+                    begin
+                        existsi xx,
+                        exact h1
+                    end,
+                contradiction
+            end
+    end
+
     example : (∃ x, p x) ↔ ¬ (∀ x, ¬ p x) :=
-    sorry
+    begin
+        apply iff.intro,
+
+        intro h,
+        intro h1,
+        cases h with xx hpxx,
+        have hnpxx : ¬ p xx, from h1 xx,
+        contradiction,
+
+        intro h,
+        exact by_contradiction
+            begin
+                intro h1,
+                have h2 : ∀ x, ¬ p x, from
+                    begin
+                        intro xx,
+                        intro h3,
+                        have h4 : ∃ (x : α), p x, from
+                            begin
+                                existsi xx,
+                                exact h3
+                            end,
+                        contradiction
+                    end,
+                contradiction
+            end
+    end
+
     example : (¬ ∃ x, p x) ↔ (∀ x, ¬ p x) :=
-    sorry
+    begin
+        apply iff.intro,
+
+        intro h,
+        intro xx,
+        intro hpxx,
+        have h1 : ∃ (x : α), p x, from
+            begin
+                existsi xx,
+                exact hpxx
+            end,
+        contradiction,
+
+        intro h,
+        intro h1,
+        cases h1 with xx hpxx,
+        have hnpxx : ¬ p xx, from h xx,
+        contradiction
+    end
+
     example : (¬ ∀ x, p x) ↔ (∃ x, ¬ p x) :=
-    sorry
+    begin
+        apply iff.intro,
+
+        intro h,
+        exact by_contradiction
+            begin
+                intro h1,
+                have h2 : ∀ x, p x, from
+                assume x1 : α,
+                by_contradiction
+                (
+                    assume h3 : ¬ p x1,
+                    h1 (exists.intro x1 h3)
+                ),
+                contradiction
+            end,
+
+        intro h,
+        cases h with xx hnpxx,
+        intro h1,
+        have hpxx : p xx, from h1 xx,
+        contradiction
+    end
 
     example : (∀ x, p x → r) ↔ (∃ x, p x) → r :=
-    sorry
+    begin
+        apply iff.intro,
+
+        intro h,
+        intro h1,
+        cases h1 with xx hpxx,
+        exact (h xx) hpxx,
+
+        intro h,
+        intro xx,
+        intro hpxx,
+        exact h (exists.intro xx hpxx)
+    end
+
     example : (∃ x, p x → r) ↔ (∀ x, p x) → r :=
     sorry
+
     example : (∃ x, r → p x) ↔ (r → ∃ x, p x) :=
     sorry
 end ch04_ex05
