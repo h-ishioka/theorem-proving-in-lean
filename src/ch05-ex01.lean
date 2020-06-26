@@ -9,21 +9,149 @@ namespace ch03_ex01
 
     -- commutativity of ∧ and ∨
     example : p ∧ q ↔ q ∧ p :=
-    sorry
+    begin
+        apply iff.intro,
+        -- ->
+        intro h,
+        cases h with hp hq,
+        constructor,
+        repeat { assumption },
+        -- <-
+        intro h,
+        cases h with hp hq,
+        constructor,
+        repeat { assumption }
+    end
+
     example : p ∨ q ↔ q ∨ p :=
-    sorry
+    begin
+        apply iff.intro,
+        -- ->
+        intro h,
+        cases h with hp hq,
+        right,
+        exact hp,
+        left,
+        exact hq,
+        -- <-
+        intro h,
+        cases h with hq hp,
+        right,
+        exact hq,
+        left,
+        exact hp
+    end
 
     -- associativity of ∧ and ∨
     example : (p ∧ q) ∧ r ↔ p ∧ (q ∧ r) :=
-    sorry
+    begin
+        apply iff.intro,
+        -- ->
+        intro h,
+        cases h with hpq hr,
+        cases hpq with hp hq,
+        constructor,
+        exact hp,
+        constructor,
+        repeat { assumption },
+        -- <-
+        intro h,
+        cases h with hp hqr,
+        cases hqr with hq hr,
+        constructor,
+        constructor,
+        repeat { assumption }
+    end
+
     example : (p ∨ q) ∨ r ↔ p ∨ (q ∨ r) :=
-    sorry
+    begin
+        apply iff.intro,
+        -- ->
+        intro h,
+        cases h with hpq hr,
+        cases hpq with hp hq,
+        apply or.inl,
+        exact hp,
+        apply or.inr,
+        apply or.inl,
+        exact hq,
+        apply or.inr,
+        apply or.inr,
+        exact hr,
+        -- <-
+        intro h,
+        cases h with hp hqr,
+        apply or.inl,
+        apply or.inl,
+        exact hp,
+        cases hqr with hq hr,
+        apply or.inl,
+        apply or.inr,
+        exact hq,
+        apply or.inr,
+        exact hr
+    end
 
     -- distributivity
     example : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) :=
-    sorry
+    begin
+        apply iff.intro,
+        -- ->
+        intro h,
+        cases h with hp hqr,
+        cases hqr with hq hr,
+        left,
+        constructor,
+        repeat { assumption },
+        right,
+        constructor,
+        repeat { assumption },
+        -- <-
+        intro h,
+        cases h with hpq hpr,
+        cases hpq with hp hq,
+        constructor,
+        exact hp,
+        left,
+        exact hq,
+        constructor,
+        cases hpr with hp hr,
+        exact hp,
+        cases hpr with hp hr,
+        right,
+        exact hr
+    end
+
     example : p ∨ (q ∧ r) ↔ (p ∨ q) ∧ (p ∨ r) :=
-    sorry
+    begin
+        apply iff.intro,
+        -- ->
+        intro h,
+        cases h with hp hqr,
+        apply and.intro,
+        left,
+        exact hp,
+        left,
+        exact hp,
+        cases hqr with hq hr,
+        apply and.intro,
+        right,
+        exact hq,
+        right,
+        exact hr,
+        -- <-
+        intro h,
+        cases h with hpq hpr,
+        cases hpq with hp hq,
+        left,
+        exact hp,
+        cases hpr with hp hr,
+        left,
+        exact hp,
+        right,
+        apply and.intro,
+        repeat { assumption }
+    end
 
     -- other properties
     example : (p → (q → r)) ↔ (p ∧ q → r) :=
