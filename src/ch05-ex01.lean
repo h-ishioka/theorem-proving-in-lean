@@ -155,27 +155,139 @@ namespace ch03_ex01
 
     -- other properties
     example : (p → (q → r)) ↔ (p ∧ q → r) :=
-    sorry
+    begin
+        apply iff.intro,
+        -- ->
+        intro h,
+        intro hpq,
+        cases hpq with hp hq,
+        exact (h hp) hq,
+        -- <-
+        intro h,
+        intro hp,
+        intro hq,
+        have hpq : p ∧ q, from ⟨hp, hq⟩,
+        exact h hpq
+    end
+
     example : ((p ∨ q) → r) ↔ (p → r) ∧ (q → r) :=
-    sorry
+    begin
+        apply iff.intro,
+        -- ->
+        intro h,
+        apply and.intro,
+        intro hp,
+        have hpq : p ∨ q, from or.inl hp,
+        exact h hpq,
+        intro hq,
+        have hpq : p ∨ q, from or.inr hq,
+        exact h hpq,
+        -- <-
+        intro h,
+        intro hpq,
+        cases h with h1 h2,
+        cases hpq with hp hq,
+        exact (h1 hp),
+        exact (h2 hq)
+    end
+
     example : ¬(p ∨ q) ↔ ¬p ∧ ¬q :=
-    sorry
+    begin
+        apply iff.intro,
+        -- ->
+        intro h,
+        apply and.intro,
+        intro hp,
+        have hpq : p ∨ q, from or.inl hp,
+        exact h hpq,
+        intro hq,
+        have hpq : p ∨ q, from or.inr hq,
+        exact h hpq,
+        -- <-
+        intro h,
+        intro hpq,
+        cases h with hnp hnq,
+        cases hpq with hp hq,
+        exact hnp hp,
+        exact hnq hq
+    end
+
     example : ¬p ∨ ¬q → ¬(p ∧ q) :=
-    sorry
+    begin
+        intro h,
+        intro hpq,
+        cases h with hnp hnq,
+        cases hpq with hp hq,
+        exact hnp hp,
+        cases hpq with hp hq,
+        exact hnq hq
+    end
+
     example : ¬(p ∧ ¬p) :=
-    sorry
+    begin
+        intro h,
+        cases h with hp hnp,
+        exact hnp hp
+    end
+
     example : p ∧ ¬q → ¬(p → q) :=
-    sorry
+    begin
+        intro h1,
+        cases h1 with hp hnq,
+        intro h2,
+        have hq : q, from h2 hp,
+        exact hnq hq
+    end
+
     example : ¬p → (p → q) :=
-    sorry
+    begin
+        intro hnp,
+        intro hp,
+        contradiction
+    end
+
     example : (¬p ∨ q) → (p → q) :=
-    sorry
+    begin
+        intro h,
+        intro hp,
+        cases h with hnp hq,
+        contradiction,
+        exact hq
+    end
+
     example : p ∨ false ↔ p :=
-    sorry
+    begin
+        apply iff.intro,
+        -- ->
+        intro h,
+        cases h with hp hfalse,
+        exact hp,
+        contradiction,
+        -- <-
+        intro hp,
+        left,
+        exact hp
+    end
+
     example : p ∧ false ↔ false :=
-    sorry
+    begin
+        apply iff.intro,
+        -- ->
+        intro h,
+        cases h with hp hfalse,
+        exact hfalse,
+        -- <-
+        intro h,
+        contradiction
+    end
+
     example : (p → q) → (¬q → ¬p) :=
-    sorry
+    begin
+        intro h,
+        intro hnq,
+        intro hp,
+        exact hnq (h hp)
+    end
 end ch03_ex01
 
 namespace ch03_ex02
