@@ -391,38 +391,139 @@ namespace ch03_ex03
     variables p : Prop
 
     example : ¬(p ↔ ¬p) :=
-    sorry
+    begin
+        intro h,
+        have hpimplnp : p → ¬p, from iff.elim_left h,
+        have hnpimplp : ¬p → p, from iff.elim_right h,
+        have hnp : ¬p, from
+            assume hp : p,
+            show false, from absurd hp (hpimplnp hp),
+        have hp : p, from hnpimplp hnp,
+        contradiction
+    end
 end ch03_ex03
 
 namespace ch04_ex01
     variables (α : Type) (p q : α → Prop)
 
     example : (∀ x, p x ∧ q x) ↔ (∀ x, p x) ∧ (∀ x, q x) :=
-    sorry
+    begin
+        apply iff.intro,
+        -- ->
+        intro h,
+        apply and.intro,
+        intro xx,
+        exact (h xx).left,
+        intro xx,
+        exact (h xx).right,
+        -- <-
+        intro h,
+        intro xx,
+        apply and.intro,
+        exact h.left xx,
+        exact h.right xx
+    end
+
     example : (∀ x, p x → q x) → (∀ x, p x) → (∀ x, q x) :=
-    sorry
+    begin
+        intro h1,
+        intro h2,
+        intro xx,
+        exact (h1 xx) (h2 xx)
+    end
+
     example : (∀ x, p x) ∨ (∀ x, q x) → ∀ x, p x ∨ q x :=
-    sorry
+    begin
+        intro h,
+        intro xx,
+        cases h with hl hr,
+        left,
+        exact hl xx,
+        right,
+        exact hr xx
+    end
 end ch04_ex01
 
 namespace ch04_ex02
+    open classical
+
     variables (α : Type) (p q : α → Prop)
     variable r : Prop
 
     example : α → ((∀ x : α, r) ↔ r) :=
-    sorry
+    begin
+        intro halpha,
+        apply iff.intro,
+        -- ->
+        intro h,
+        exact h halpha,
+        -- <-
+        intro hr,
+        intro halpha',
+        exact hr
+    end
+
     example : (∀ x, p x ∨ r) ↔ (∀ x, p x) ∨ r :=
-    sorry
+    begin
+        apply iff.intro,
+        -- ->
+        intro h,
+        cases (em r) with hr hnr,
+        right,
+        exact hr,
+        left,
+        intro xx,
+        cases (h xx) with hpxx hr,
+        exact hpxx,
+        contradiction,
+        -- <-
+        intro h,
+        intro xx,
+        cases h with hl hr,
+        left,
+        exact hl xx,
+        right,
+        exact hr
+    end
+
     example : (∀ x, r → p x) ↔ (r → ∀ x, p x) :=
-    sorry
+    begin
+        apply iff.intro,
+        -- ->
+        intro h,
+        intro hr,
+        intro xx,
+        exact h xx hr,
+        -- <-
+        intro h,
+        intro xx,
+        intro hr,
+        exact h hr xx
+    end
 end ch04_ex02
 
 namespace ch04_ex03
+    open classical
+
     variables (men : Type) (barber : men)
     variable  (shaves : men → men → Prop)
 
     example (h : ∀ x : men, shaves barber x ↔ ¬ shaves x x) : false :=
-    sorry
+    begin
+        cases (em (shaves barber barber)) with h1 h1',
+        {
+            have h2 : shaves barber barber ↔ ¬ shaves barber barber, from h barber,
+            have h3 : shaves barber barber → ¬ shaves barber barber, from iff.mp h2,
+            have h4 : ¬ shaves barber barber, from h3 h1,
+            contradiction
+        },
+        {
+            have h2 : shaves barber barber ↔ ¬ shaves barber barber, from h barber,
+            have h3 : ¬ shaves barber barber → shaves barber barber, from iff.mpr h2,
+            have h4 : shaves barber barber, from h3 h1',
+            contradiction
+        }
+    end
 end ch04_ex03
 
 namespace ch04_ex04
